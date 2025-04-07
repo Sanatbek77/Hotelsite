@@ -9,7 +9,7 @@ class UserProfile(AbstractUser):
         ('client', 'client'),
         ('owner', 'owner'),
     )
-    user_role = models.CharField(max_length=16, choices=ROLE_CHOICES, default='simpleUser'),
+    user_role = models.CharField(max_length=16, choices=ROLE_CHOICES, default='client'),
     phone_number = PhoneNumberField(region='KG', null=True, blank=True)
     age = models.PositiveSmallIntegerField(validators=[MinValueValidator(18),
                                                        MaxValueValidator(70)], null=True, blank=True)
@@ -24,7 +24,7 @@ class Hotel(models.Model):
     owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     hotel_description = models.TextField()
     country = models.CharField(max_length=32)
-    city = models.ForeignKey(City)
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
     address = models.CharField(max_length=32)
     hotel_stars = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     hotel_video = models.FileField(upload_to='hotel_video/', null=True, blank=True)
@@ -41,13 +41,13 @@ class Hotel(models.Model):
 
 
 class HotelImage(models.Model):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE,related_name='hotel_images')
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
     hotel_images = models.ImageField(upload_to='hotel_image/')
 
 
 class Room(models.Model):
     room_number = models.PositiveSmallIntegerField()
-    hotel_room = models.ForeignKey(Hotel,on_delete=models.CASCADE,related_name='rooms')
+    hotel_room = models.ForeignKey(Hotel,on_delete=models.CASCADE)
     TYPE_CHOICES = (
         ('люкс','люкс'),
         ('семейный','семейный'),
@@ -71,15 +71,15 @@ class Room(models.Model):
 
 
 class RoomImage(models.Model):
-    room = models.ForeignKey(Room,on_delete=models.CASCADE,related_name='room_images')
+    room = models.ForeignKey(Room,on_delete=models.CASCADE)
     room_image = models.ImageField(upload_to='room_image/')
 
 
 class Review(models.Model):
     user_name = models.ForeignKey(UserProfile,on_delete=models.CASCADE)
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE,related_name='reviews')
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
     text = models.TextField(null=True,blank=True)
-    stars = models.ForeignKey(choices=[(i, str(i))for i in range(1,11)],null=True,blank=True)
+    stars = models.IntegerField(choices=[(i, str(i))for i in range(1,11)],null=True,blank=True)
     parent = models.ForeignKey('self',on_delete=models.CASCADE,null=True,blank=True)
 
     def __str__(self):
@@ -93,8 +93,8 @@ class Booking(models.Model):
     check_in = models.DateTimeField()
     check_out = models.DateTimeField()
     STATUS_BOOK_CHOICES = (
-        ('отменено'), ('отменено'),
-        ('подтверждено'), ('подтверждено')
+        ('отменено', 'отменено'),
+        ('подтверждено', 'подтверждено')
     )
     status_book = models.CharField(max_length=16, choices=STATUS_BOOK_CHOICES)
 
