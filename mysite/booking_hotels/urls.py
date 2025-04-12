@@ -9,9 +9,9 @@ router.register(r'countries', CountryViewSet, basename='country_list'),
 
 
 urlpatterns = [
-    # path('register/', RegisterView.as_view(), name='register_list'),
-    # path('login/', CustomLoginView.as_view(), name='login_list'),
-    # path('logout/', LogoutView.as_view(), name='logout_list'),
+    path('register/', RegisterView.as_view(), name='register_list'),
+    path('login/', CustomLoginView.as_view(), name='login_list'),
+    path('logout/', LogoutView.as_view(), name='logout_list'),
 
     path('', include(router.urls)),
     path('hotels/', HotelListAPIView.as_view(), name='hotel_list'),
